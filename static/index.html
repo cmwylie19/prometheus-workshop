@@ -1,0 +1,222 @@
+<!--
+File: index.html
+Author: Casey Wylie
+Description: Landing page for Prometheus Workshop Demo App
+Date: February 16, 2023
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Prometheus Workshop</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+  <style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      font-family: "Raleway", sans-serif
+    }
+
+    .rotate-360 {
+      transition-duration: 0.3s;
+      transition-property: transform;
+    }
+
+    .rotate-360-now {
+      transform: rotate(360deg);
+      -webkit-transform: rotate(360deg);
+    }
+  </style>
+</head>
+
+<body class="w3-light-grey">
+
+  <div class="w3-content" style="max-width:1400px">
+
+    <!-- Header -->
+    <header class="w3-container w3-center w3-padding-32">
+      <h1><b>MY BLOG</b></h1>
+
+      <h4>Total Hits: <div class="w3-tag sample rotate-360"></div>
+      </h4>
+
+      <script>
+        let sampleEle = document.querySelector(".sample");
+
+
+        (function () {
+          setInterval(() => {
+            fetch('http://localhost:2112/hits')
+              .then((response) => response.json())
+              .then((data) => {
+
+                sampleEle.innerHTML = data
+
+                setTimeout(() => {
+                  document.querySelector(".rotate-360").classList.remove("rotate-360-now");
+                }, 2000)
+                document.querySelector(".rotate-360").classList.add("rotate-360-now");
+
+              });
+
+            sampleEle.innerHTML = "Loading...";
+          }, 3000)
+
+        })();
+      </script>
+    </header>
+
+    <!-- Grid -->
+    <div class="w3-row">
+
+      <!-- Blog entries -->
+      <div class="w3-col l8 s12">
+        <!-- Blog entry -->
+        <div class="w3-card-4 w3-margin w3-white">
+          <img src="Grafana_dashboard.png" alt="Nature" style="width:100%">
+          <div class="w3-container">
+            <h3><b>Instrumenting and Scraping Application Metrics Workshop</b></h3>
+            <h5>Step by step workshop to scrape metrics using Prometheus and Kubernetes.<br /> <span
+                class="w3-opacity">April 7, 2023</span></h5>
+          </div>
+
+          <div class="w3-container">
+            <p>Monitoring your applications is important to ensure that they are functioning correctly, to identify any
+              issues or errors that may arise, and to optimize performance. By monitoring your applications, you can
+              prevent downtime, reduce the risk of data loss, ensure that your users have a positive experience, and
+              yada, yada, yada</p>
+            <div class="w3-row">
+              <div class="w3-col m8 s12">
+                <p><button class="w3-button w3-padding-large w3-white w3-border"><b class="click"
+                      onclick="alert('for demo only')">READ MORE
+                      »</b></button></p>
+              </div>
+              <div class="w3-col m4 w3-hide-small">
+                <p><span class="w3-padding-large w3-right"><b>Comments </b> <span class="w3-tag">77</span></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+
+        <!-- Blog entry -->
+        <div class="w3-card-4 w3-margin w3-white">
+          <img src="hotones.jpg" alt="hotones s19" style="width:100%">
+          <div class="w3-container">
+            <h3><b>The hottest hotsauce</b></h3>
+            <h5>I eat hot sauce every day<br /> <span class="w3-opacity">Feb 16, 2023</span></h5>
+          </div>
+
+          <div class="w3-container">
+            <p>Checkout <a href="https://www.youtube.com/channel/UCPD_bxCRGpmmeQcbe2kpPaA" target="_BLANK">hot 
+                ones</a> to learn about some delicious hot sauces, like "da bomb, unique garlic, apollo" and more...</p>
+            <p>Unique Garlic has a nice kick, but I also like Cosmic Disco, and Chile Lengua de Fuego.</p>
+            <div class="w3-row">
+              <div class="w3-col m8 s12">
+                <p><button class="w3-button w3-padding-large w3-white w3-border"><b class="click"
+                      onclick="alert('for demo only')">READ MORE
+                      »</b></button></p>
+              </div>
+              <div class="w3-col m4 w3-hide-small">
+                <p><span class="w3-padding-large w3-right"><b>Comments </b> <span class="w3-badge">2</span></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END BLOG ENTRIES -->
+      </div>
+
+      <!-- Introduction menu -->
+      <div class="w3-col l4">
+        <!-- About Card -->
+        <div class="w3-card w3-margin w3-margin-top">
+          <img src="pic.jpg" style="width:100%">
+          <div class="w3-container w3-white">
+            <h4><b>Casey Wylie</b></h4>
+            <p>Just a fake blog instrumented to emit real metrics, check out my <a href="https://caseywylie.io"
+                target="_blank">real blog</a>, though.</p>
+          </div>
+        </div>
+        <hr>
+
+        <!-- Posts -->
+        <div class="w3-card w3-margin">
+          <div class="w3-container w3-padding">
+            <h4>Socials</h4>
+          </div>
+          <ul class="w3-ul w3-hoverable w3-white">
+            <li class="w3-padding-16">
+              <span class="fa-stack fa-lg w3-margin-right">
+                <i class="fa fa-stack-2x"></i>
+                <i class="fa fa-twitter fa-stack-1x" style="color:lightskyblue"></i>
+              </span>
+              <!-- <img src="/w3images/workshop.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px"> -->
+              <span class="w3-large"><a href="https://www.twitter.com/cmwylie19"
+                  target="_blank">cmwylie19.</a></span><br>
+            </li>
+            <li class="w3-padding-16 ">
+              <span class="fa-stack fa-lg w3-margin-right">
+                <i class="fa fa-stack-2x"></i>
+                <i class="fa fa-linkedin fa-stack-1x" style="color:rgb(24, 121, 248)"></i>
+              </span>
+              <!-- <img src="/w3images/workshop.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px"> -->
+              <span class="w3-large"><a href="https://www.linkedin.com/in/casewylie/" target="_blank">Casey
+                  Wylie.</a></span><br>
+            </li>
+            <li class="w3-padding-16 ">
+              <span class="fa-stack fa-lg w3-margin-right">
+                <i class="fa fa-stack-2x"></i>
+                <i class="fa fa-github fa-stack-1x" style="color: black;"></i>
+              </span>
+              <!-- <img src="/w3images/workshop.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px"> -->
+              <span class="w3-large"><a href="https://cmwylie19.github.io/" target="_blank">cmwylie19.</a></span><br>
+            </li>
+          </ul>
+        </div>
+        <hr>
+
+        <!-- Labels / tags -->
+        <div class="w3-card w3-margin">
+          <div class="w3-container w3-padding">
+            <h4>Tags</h4>
+          </div>
+          <div class="w3-container w3-white">
+            <p><span class="w3-tag w3-black w3-margin-bottom">Kubernetes</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">OpenShift</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">Federation</span>
+              <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Go</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">Prometheus</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">DIY</span>
+              <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Open Metrics</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">CNCF</span>
+              <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Cloud Native</span> <span
+                class="w3-tag w3-light-grey w3-small w3-margin-bottom">Hybrid Cloud</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- END Introduction Menu -->
+      </div>
+
+      <!-- END GRID -->
+    </div><br>
+
+    <!-- END w3-content -->
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
+    <p>Powered by <a href="mailto:casewylie@gmail.com?subject=Awesome Demo Pal!" target="_blank">Kubernetes</a></p>
+  </footer>
+
+</body>
+
+</html>
