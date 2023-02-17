@@ -12,7 +12,7 @@ Date: February 16, 2023
   <title>Prometheus Workshop</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="w3.css">
+  <link rel="stylesheet" href="./w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
   <style>
@@ -54,7 +54,7 @@ Date: February 16, 2023
 
         (function () {
           setInterval(() => {
-            fetch('http://localhost:2112/hits')
+            fetch('http://localhost:8080/hits')
               .then((response) => response.json())
               .then((data) => {
 
@@ -81,7 +81,7 @@ Date: February 16, 2023
       <div class="w3-col l8 s12">
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
-          <img src="Grafana_dashboard.png" alt="Nature" style="width:100%">
+          <img src="./Grafana_dashboard.png" alt="Nature" style="width:100%">
           <div class="w3-container">
             <h3><b>Instrumenting and Scraping Application Metrics Workshop</b></h3>
             <h5>Step by step workshop to scrape metrics using Prometheus and Kubernetes.<br /> <span

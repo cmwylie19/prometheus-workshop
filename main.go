@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -62,6 +63,14 @@ func handleHit(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strconv.Itoa(count)))
 }
 
+// HealthCheckHandler returns a 200 if the server is up
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	io.WriteString(w, `{"alive": true}`)
+}
+
 // Middleware for counting hits to the web app
 // This only works if there is one replicas of the backend.
 // This data is ephemeral and will be lost if the backend is restarted.
@@ -69,6 +78,21 @@ func handleHit(w http.ResponseWriter, r *http.Request) {
 func hitCounterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		count += 1
+		next.ServeHTTP(w, r)
+	})
+}
+
+func EnableCors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -102,6 +126,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.Use(prometheusMiddleware)
+	router.Use(EnableCors)
 
 	// Static files
 	fs := http.FileServer(http.Dir("./static"))
@@ -110,7 +135,10 @@ func main() {
 	router.Path("/metrics").Handler(promhttp.Handler())
 
 	// web app
-	router.Path("/").Handler(hitCounterMiddleware(fs))
+	router.PathPrefix("/web/").Handler(http.StripPrefix("/web/", hitCounterMiddleware(fs)))
+
+	// health check endpoint
+	router.Path("/healthz").HandlerFunc(HealthCheckHandler)
 
 	// hits at the web app endpoint
 	router.Path("/hits").HandlerFunc(handleHit)

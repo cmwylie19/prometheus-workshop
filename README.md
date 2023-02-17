@@ -104,7 +104,7 @@ Alright, now lets get to the fun stuff!!
 
 Lets spin up a Kubernetes cluster using Kind. Kind is a tool for running local Kubernetes clusters using Docker container "nodes". Kind was chosen because it is easy to spin up and tear down a cluster. Kind is not meant for production use, but it is great for demos and testing.
 
-In this case, we are going to map the host port 80 to the container port 33333, which will be the `NodePort` where the application is exposed. This will allow the application's frontend to access the backend from our local machine.
+In this case, we are going to map the host port 3333 to the container port 31388, which will be the `NodePort` where the application is exposed. This will allow the application's frontend to access the backend from our local machine.
 
 To spin up a cluster, run the following command:
 
@@ -115,11 +115,50 @@ apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
   extraPortMappings:
-  - containerPort: 33333
-    hostPort: 80
+  - containerPort: 31388
+    hostPort: 8080
     protocol: TCP
 EOF
 ```
 
+## Deploy the Demo App
 
+
+Now that we have a cluster, lets deploy the demo app. The demo app is a simple demo blog.
+
+```bash
+kubectl apply -f k8s/
+kubectl config set-context $(kubectl config current-context) --namespace=demo
+```
+
+expected output
+```bash
+namespace/demo created
+deployment.apps/blog created
+service/blog created
+Context "kind-prom-demo" modified.
+```
+
+Wait for the pod to become ready   
+  
+```bash
+kubectl wait --for=condition=Ready pod -l app=blog --timeout=4m 
+```
+
+Lets check to see if the application is running curling the health endpoint (The demo service is deployed as a `NodePort` service, so we can access it from our local machine, we have mapped 31388 which is the container port to 3333 which is the host port, which means we can curl it from our local machine):
+
+
+```bash
+curl localhost:3333/healthz | jq 
+```
+
+output
+```json
+{
+  "alive": true
+}
+```
+
+
+Open up the app in the browser by going to [`localhost:3333`](http://localhost:3333) and you should see the following:
 ## Clean Up

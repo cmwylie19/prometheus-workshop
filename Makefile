@@ -2,7 +2,6 @@
 SHELL=bash
 DOCKER_USERNAME=cmwylie19
 TAG ?= v0.0.1
-ARCH ?= amd64
 # The stage to build, one of: dev, test, prod
 # Default to dev if not set.
 # dev is compiled for amd64 architecture (Kind)
@@ -16,24 +15,24 @@ IMAGE ?= ${DOCKER_USERNAME}/demo-blog:${TAG}
 # Build the secret-watcher binary
 
 .PHONY: compile
-compile: $(shell find . -name '*.go')
-	GOARCH=${ARCH} CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o build/demo
+compile:
+	GOARCH=amd64 GOOS=linux go build -o build/demo
 
 
 #---------------------------
 # Build the docker image
 
-.PHONY: build/image
-build/image: build/secret-watcher
+.PHONY: build
+build: 
 	docker build -t $(IMAGE) build/
-	rm build/secret-watcher
+	rm build/demo
 
 #--------------------------------
 # Push the docker image to dockerhub
-.PHONY: push-image
-push-image: build/image
+.PHONY: push
+push: 
 	docker push $(IMAGE)
 
 #--------------------------------
-all: build/secret-watcher build/image push-image
-	@echo "Done building secret-watcher for ${ARCH}"
+all: compile build push
+	@echo "Done building demo for ${ARCH}"
