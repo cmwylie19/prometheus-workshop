@@ -24,7 +24,7 @@ compile:
 
 .PHONY: build
 build: 
-	docker build -t $(IMAGE) build/
+	docker build -t $(IMAGE) .
 	rm build/demo
 
 #--------------------------------

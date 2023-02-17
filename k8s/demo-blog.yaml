@@ -35,18 +35,19 @@ spec:
           value: "8080"
         ports:
         - containerPort: 8080
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          name: http
+        # livenessProbe:
+        #   httpGet:
+        #     path: /api/healthz
+        #     port: 8080
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
+        # readinessProbe:
+        #   httpGet:
+        #     path: /api/healthz
+        #     port: 8080
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
         # resources:
         #   limits:
         #     cpu: 100m
@@ -67,6 +68,7 @@ spec:
   ports:
   - port: 8080
     protocol: TCP
+    name: http
     targetPort: 8080
     nodePort: 31388
   selector:

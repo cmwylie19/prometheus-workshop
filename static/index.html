@@ -54,7 +54,7 @@ Date: February 16, 2023
 
         (function () {
           setInterval(() => {
-            fetch('http://localhost:8080/hits')
+            fetch('http://localhost:8080/api/hits')
               .then((response) => response.json())
               .then((data) => {
 
@@ -138,7 +138,7 @@ Date: February 16, 2023
       <div class="w3-col l4">
         <!-- About Card -->
         <div class="w3-card w3-margin w3-margin-top">
-          <img src="pic.jpg" style="width:100%">
+          <img src="./pic.jpg" style="width:100%">
           <div class="w3-container w3-white">
             <h4><b>Casey Wylie</b></h4>
             <p>Just a fake blog instrumented to emit real metrics, check out my <a href="https://caseywylie.io"

@@ -12,6 +12,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/storage/remote"
 )
 
 type responseWriter struct {
@@ -82,6 +84,35 @@ func hitCounterMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// handleMetrics receives metrics from prometheus
+func handleMetrics(w http.ResponseWriter, r *http.Request) {
+	req, err := remote.DecodeWriteRequest(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for _, ts := range req.Timeseries {
+		m := make(model.Metric, len(ts.Labels))
+		for _, l := range ts.Labels {
+			m[model.LabelName(l.Name)] = model.LabelValue(l.Value)
+		}
+
+		fmt.Println(m)
+
+		for _, s := range ts.Samples {
+			utils.WriteLog("INFO", fmt.Sprintf("\tSample:  %f %d\n", s.Value, s.Timestamp))
+		}
+
+		for _, e := range ts.Exemplars {
+			m := make(model.Metric, len(e.Labels))
+			for _, l := range e.Labels {
+				m[model.LabelName(l.Name)] = model.LabelValue(l.Value)
+			}
+			utils.WriteLog("INFO", fmt.Sprintf("\tExemplar:  %+v %f %d\n", m, e.Value, e.Timestamp))
+		}
+	}
+}
 func EnableCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -132,16 +163,19 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 
 	// metrics endpoint
-	router.Path("/metrics").Handler(promhttp.Handler())
-
-	// web app
-	router.PathPrefix("/web/").Handler(http.StripPrefix("/web/", hitCounterMiddleware(fs)))
+	router.Path("/api/metrics").Handler(promhttp.Handler())
 
 	// health check endpoint
-	router.Path("/healthz").HandlerFunc(HealthCheckHandler)
+	router.Path("/api/healthz").HandlerFunc(HealthCheckHandler)
 
 	// hits at the web app endpoint
-	router.Path("/hits").HandlerFunc(handleHit)
+	router.Path("/api/hits").HandlerFunc(handleHit)
+
+	// remoteWrite endpoint
+	router.Path("/api/remote").HandlerFunc(handleMetrics)
+
+	// web app
+	router.PathPrefix("/").Handler(hitCounterMiddleware(fs))
 
 	utils.WriteLog("INFO", fmt.Sprintf("Server started at port %s", utils.GetPort()))
 	err := http.ListenAndServe(":"+utils.GetPort(), router)
