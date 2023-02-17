@@ -32,6 +32,8 @@ func WriteLog(level string, message string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// remove timestamp prefix
+	log.SetFlags(0)
 	log.Println(string(logBytes))
+
 }

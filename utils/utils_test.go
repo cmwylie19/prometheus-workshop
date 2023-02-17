@@ -27,6 +27,7 @@ func TestGetPort(t *testing.T) {
 
 func TestWriteLog(t *testing.T) {
 	var buf bytes.Buffer
+
 	log.SetOutput(&buf)
 
 	tests := []struct {

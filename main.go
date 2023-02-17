@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -114,9 +115,11 @@ func main() {
 	// hits at the web app endpoint
 	router.Path("/hits").HandlerFunc(handleHit)
 
-	err := http.ListenAndServe(":2112", router)
-	log.Fatal(err)
-
-	utils.WriteLog("INFO", "HI")
+	utils.WriteLog("INFO", fmt.Sprintf("Server started at port %s", utils.GetPort()))
+	err := http.ListenAndServe(":"+utils.GetPort(), router)
+	if err != nil {
+		utils.WriteLog("ERROR", err.Error())
+		log.Fatal(err)
+	}
 
 }
