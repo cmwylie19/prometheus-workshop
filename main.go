@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cmwylie19/prometheus-workshop/utils"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -115,4 +116,7 @@ func main() {
 
 	err := http.ListenAndServe(":2112", router)
 	log.Fatal(err)
+
+	utils.WriteLog("INFO", "HI")
+
 }

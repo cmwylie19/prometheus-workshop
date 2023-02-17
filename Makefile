@@ -1,36 +1,23 @@
 # Makefile for building the secret-watcher server + docker image.
 SHELL=bash
 DOCKER_USERNAME=cmwylie19
-
+TAG ?= v0.0.1
+ARCH ?= amd64
 # The stage to build, one of: dev, test, prod
 # Default to dev if not set.
 # dev is compiled for amd64 architecture (Kind)
 # test is compiled for arm64 architecture (Rasberry Pi)
 # prod is compiled for amd64 architecture (OpenShift)
 
-ifndef ENVIRONMENT
-	export ENVIRONMENT :=prod
-endif
 
-ifeq ($(ENVIRONMENT),dev)
-	export ARCH :=amd64
-else ifeq ($(ENVIRONMENT),test)
-	export ARCH :=arm64
-else ifeq ($(ENVIRONMENT),prod)
-	export ARCH :=amd64
-else
-	$(error STAGE must be one of: dev, test, prod)
-endif
-
-
-IMAGE ?= ${DOCKER_USERNAME}/secret-watcher:${ARCH}
+IMAGE ?= ${DOCKER_USERNAME}/demo-blog:${TAG}
 
 #---------------------------
 # Build the secret-watcher binary
 
-.PHONY: build/secret-watcher
-build/secret-watcher: $(shell find . -name '*.go')
-	GOARCH=${ARCH} CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o $@ ./cmd/secret-watcher
+.PHONY: compile
+compile: $(shell find . -name '*.go')
+	GOARCH=${ARCH} CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o build/demo
 
 
 #---------------------------
