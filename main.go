@@ -62,11 +62,14 @@ var count int = 0
 
 // handleHit returns the number of hits to the web app
 func handleHit(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(strconv.Itoa(count)))
+	string_hits := strconv.Itoa(count)
+	utils.WriteLog("INFO", fmt.Sprintf("Request to handleHit endpoint, hit number %s", string_hits))
+	w.Write([]byte(string_hits))
 }
 
 // HealthCheckHandler returns a 200 if the server is up
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	utils.WriteLog("INFO", "Request to healthCheck endpoint")
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -86,6 +89,7 @@ func hitCounterMiddleware(next http.Handler) http.Handler {
 
 // handleMetrics receives metrics from prometheus
 func handleMetrics(w http.ResponseWriter, r *http.Request) {
+	utils.WriteLog("INFO", "Request to handleMetrics endpoint")
 	req, err := remote.DecodeWriteRequest(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

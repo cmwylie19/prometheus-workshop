@@ -61,7 +61,7 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-Prometheus has a lot of resources on how to instrument your application. Here is a link to get you started:
+Prometheus has resources on how to instrument your application. Here is a link to get you started:
 - [Prometheus Website](https://prometheus.io/docs/guides/go-application/)
 
 
@@ -200,7 +200,7 @@ Open up the app in the browser by going to [`localhost:8080`](http://localhost:8
 
 ## Deploy Prometheus Operator
 
-Now that we have a cluster and a demo app, lets deploy Prometheus Operator. Prometheus Operator is a Kubernetes Operator that creates, configures, and manages Prometheus instances in Kubernetes. It is a great tool for deploying Prometheus in Kubernetes. 
+Now that we have a cluster and a demo app, let's deploy Prometheus Operator. Prometheus Operator is a Kubernetes Operator that creates, configures, and manages Prometheus instances in Kubernetes. It is a great tool for deploying Prometheus in Kubernetes. 
 
 ```bash
 kubectl create -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml 
@@ -214,7 +214,7 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=prometheus-oper
 
 ## Configure Prometheus
 
-Now that we have the operator installed, we are going to install a `Prometheus` instance. The `Prometheus` instance will be configured to remoteWrite metrics to the demo app. 
+Now that we have the operator installed, we are going to deploy a `Prometheus` instance. The `Prometheus` instance will be configured to remoteWrite metrics to the demo app. 
 
 ```yaml
 kubectl create -f -<<EOF
@@ -224,6 +224,8 @@ metadata:
   name: k8s
   namespace: default
 spec:
+  # all prometheusRules
+  ruleSelector: {}
   # all serviceMontiors in the namespace
   serviceMonitorSelector: {}
   # all namespaces
@@ -234,7 +236,7 @@ spec:
   image: quay.io/prometheus/prometheus:v2.35.0
   serviceAccountName: prometheus-operator 
   remoteWrite:
-    - url: http://localhost:8080/api/remote # My app to read the metrics
+    - url: http://localhost:8080/api/remote # Demo app to remoteRead endpoint
   resources:
     requests:
       memory: 400Mi
@@ -381,5 +383,79 @@ up{container="blog", endpoint="http", instance="10.244.0.11:8080", job="blog", n
 1
 ```
 
+
+Next, we are going to deploy a `PrometheusRule`, define some custom rules and alerts.l alert us if the `up` metric is `0` for 5 minutes. 
+
+```yaml
+kubectl apply -f -<<EOF
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule 
+metadata:
+  labels:
+    app: blog
+  name: blog
+  namespace: default
+spec:
+  groups:
+  - name: blog_custom_rules
+    # In this case, we need to trigger an alert as soon as an instances goes down for demo, 15s too long
+    interval: 1s # Configurable like doc says 
+    rules: 
+
+    # The average memory used by all queries over a given time period
+    - record: blog_up
+      expr: up{container="blog"} == 1
+
+    # The max memory available to queries cluster wide
+    - record: twentieth_visitor
+      expr: http_requests_total{container="blog", path="/"} >= 20
+
+
+  - name: starburst_alert_rules
+    rules: 
+ 
+    # Instance down for 1 minute
+    - alert: blog_down
+      expr: absent(blog_up)
+      for: 1m
+      labels:
+        severity: page
+      annotations:
+        summary: "Blog instance down for 1 min"
+        description: "Instance of the blog is down" 
+
+    # 20th Visitor
+    - alert: twentieth_visitor
+      expr: twentieth_visitor
+      labels:
+        severity: page
+      annotations:
+        summary: "20th Visitor Alert"
+        description: "Since deployed, the 20th visitor has hit the blog" 
+EOF
+```
+
+
+Lets talk about external Labels. External labels are labels that are added to every metric that is collected by Prometheus. This is a great way to add context to your metrics. When you are federating metrics from one cluster to another, and you have many metrics with the same name, you can use external labels to differentiate between them, for instnace, you can add an external labek `cluster: dev` to all metrics collected from the dev cluster. 
+
+
+What about debugging? Well, you can use the []`promtool`](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/#configuring-rules) to check if your rules are valid. Another way, is to check the logs of the prometheus operator. 
+
+```bash
+k logs -f -l app.kubernetes.io/name=prometheus-operator -n default
+```
+
+If you had misconfigured a rule or serviceMonitor, you would get an error in the logs
+
+```bash
+k logs -f -l app.kubernetes.io/name=prometheus-operator -n default | grep l
+evel=error
+```
+
+output
+```bash
+level=error ts=2023-02-18T14:49:35.199449956Z caller=klog.go:116 component=k8s_client_runtime func=ErrorDepth msg="sync \"default/k8s\" failed: Invalid rule"
+level=error ts=2023-02-18T14:50:42.19384299Z caller=klog.go:116 component=k8s_client_runtime func=ErrorDepth msg="sync \"default/k8s\" failed: Invalid rule"
+```
 
 ## Clean Up

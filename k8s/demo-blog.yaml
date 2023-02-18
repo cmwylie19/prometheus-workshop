@@ -36,25 +36,25 @@ spec:
         ports:
         - containerPort: 8080
           name: http
-        # livenessProbe:
-        #   httpGet:
-        #     path: /api/healthz
-        #     port: 8080
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 5
-        # readinessProbe:
-        #   httpGet:
-        #     path: /api/healthz
-        #     port: 8080
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 5
-        # resources:
-        #   limits:
-        #     cpu: 100m
-        #     memory: 128Mi
-        #   requests:
-        #     cpu: 100m
-        #     memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
 ---
 apiVersion: v1
 kind: Service

@@ -35,4 +35,4 @@ push:
 
 #--------------------------------
 all: compile build push
-	@echo "Done building demo for ${ARCH}"
+	@echo "Done building demo for ${IMAGE}"
