@@ -19,7 +19,7 @@
 
 ## Demo Background
 
-_In this demo, we are going to deploy a go application (Fake Blog Server) that emits metrics to a Prometheus server. We will then use Grafana to visualize the metrics. We will incorportate Prometheus's remoteWrite functionality to demonstrate how metrics can be federated across environments. The first section `Instrumenting in Go 101` can be skipped if you just want to skip to the interactive demo._
+_In this demo, we are going to deploy a go application (Fake Blog Server) that emits metrics to a Prometheus server. We are going to look at several key features of Prometheus, including `externalLabels` to identify metrics in a federated environment, `remoteWrite` to demonstrate how metrics can be federated across environments, `prometheusRules` to define and trigger alert, and `serviceMonitors` to tell Prometheus what to scrape. The first section is `Instrumenting in Go 101`, and can be skipped if you just want to skip to the interactive demo._
 
 ## Instrumenting in Go 101
 
@@ -236,7 +236,7 @@ spec:
   image: quay.io/prometheus/prometheus:v2.35.0
   serviceAccountName: prometheus-operator 
   remoteWrite:
-    - url: http://localhost:8080/api/remote # Demo app to remoteRead endpoint
+    - url: http://$(kubectl get no prom-demo-control-plane -ojsonpath='{.status.addresses[0].address}'):31388/api/remote # Demo app to remoteRead endpoint through nodePort
   resources:
     requests:
       memory: 400Mi
