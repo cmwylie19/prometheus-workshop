@@ -89,7 +89,7 @@ func hitCounterMiddleware(next http.Handler) http.Handler {
 
 // handleMetrics receives metrics from prometheus
 func handleMetrics(w http.ResponseWriter, r *http.Request) {
-	utils.WriteLog("INFO", "Request to handleMetrics endpoint")
+	// utils.WriteLog("INFO", "Request to handleMetrics endpoint")
 	req, err := remote.DecodeWriteRequest(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
