@@ -370,7 +370,7 @@ EOF
 
 Now, bind it to the service account `prometheus-operator` in the default namespace
 
-```bash
+```yaml
 kubectl apply -f -<<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -388,7 +388,7 @@ subjects:
 EOF
 ```
 
-Make sure that the `ServiceAccount` `prometheus-operator` has the correct permissions
+Make sure that the service-account `prometheus-operator` has the correct permissions
 
 ```bash
 kubectl auth can-i get pods --as=system:serviceaccount:default:prometheus-operator -n demo
@@ -646,3 +646,5 @@ That said, we have learned:
 ```bash
 kind delete cluster --name=prom-demo
 ```
+
+[Back to top](#kubernetes-metrics-workshop)
