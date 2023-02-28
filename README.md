@@ -19,7 +19,7 @@
 
 ## Demo Background
 
-_In this demo, we are going to deploy a Go application (Fake Blog Server) that emits metrics to a Prometheus server. We are going to look at several key features of Prometheus, including `externalLabels` to identify metrics in a federated environment, `remoteWrite` to demonstrate how metrics can be federated across environments, `prometheusRules` to define and trigger alerts, `serviceMonitors` to tell Prometheus what to scrape and finally, we will briefly chat about debugging your metrics environment. The first section is `Instrumenting in Go 101`, and can be skipped if you just want to skip to the interactive demo._
+_In this demo, we are going to deploy a Go application (Fake Blog Server) that emits metrics to a Prometheus server. We are going to look at several key features of Prometheus, including `externalLabels` to identify metrics in a federated environment, `remoteWrite` to demonstrate how metrics can be federated across environments, `prometheusRules` to define and trigger alerts, `serviceMonitors` to tell Prometheus what to scrape and finally, we will briefly chat about debugging your metrics environment. The first section is `Instrumenting in Go 101`, and can be [skipped](#spin-up-a-kubernetes-cluster) if you just want to skip to the interactive demo._
 
 ## Instrumenting in Go 101
 
@@ -82,7 +82,7 @@ func main() {
 }
 ```
 
-This is a great start, but in reality, we need custom metrics. The below example shows how to add a custom metric `myapp_processed_ops_total` to the metrics endpoint which will increase by 1 every 2 seconds.
+This is a great start, but in reality, we need custom metrics. The below example shows how to add a custom metric `custom_processed_ops_total` to the metrics endpoint which will increase by 1 every 2 seconds.
 
 ```go
 package main
@@ -107,7 +107,7 @@ func recordMetrics() {
 
 var (
         opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
-                Name: "myapp_processed_ops_total",
+                Name: "custom_processed_ops_total",
                 Help: "The total number of processed events",
         })
 )
@@ -340,7 +340,7 @@ EOF
 Wait for the operator to spin up the Prometheus instance
 
 ```bash
-kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=k8s --timeout=4m -n default
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=blog --timeout=4m -n default
 ```
 
 Next, we need to give the `serviceAccount` `prometheus-operator` permission to scrape `Endpoints`, `Services`, and `Pods` in the demo namespace. Since we need to go across namespace, we are going to create a `ClusterRole` and `ClusterRoleBinding`. 
